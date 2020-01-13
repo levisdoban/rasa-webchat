@@ -118,6 +118,8 @@ const ConnectedWidget = forwardRef((props, ref) => {
         tooltipPayload={props.tooltipPayload}
         tooltipDelay={props.tooltipDelay}
         disableTooltips={props.disableTooltips}
+        defaultHighlightCss={props.defaultHighlightCss}
+        defaultHighlightAnimation={props.defaultHighlightAnimation}
       />
     </Provider>
   );
@@ -162,7 +164,9 @@ ConnectedWidget.propTypes = {
     onChatVisible: PropTypes.func,
     onChatHidden: PropTypes.func
   }),
-  disableTooltips: PropTypes.bool
+  disableTooltips: PropTypes.bool,
+  defaultHighlightCss: PropTypes.string,
+  defaultHighlightAnimation: PropTypes.string
 };
 
 ConnectedWidget.defaultProps = {
