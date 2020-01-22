@@ -30,7 +30,8 @@ import {
   setPageChangeCallbacks,
   changeOldUrl,
   setDomHighlight,
-  evalUrl
+  evalUrl,
+  setCustomCss
 } from 'actions';
 
 import { SESSION_NAME, NEXT_MESSAGE } from 'constants';
@@ -193,8 +194,12 @@ class Widget extends Component {
     const { dispatch } = this.props;
     this.clearCustomStyle();
     dispatch(clearMetadata());
+
     if (botUtterance.metadata) this.propagateMetadata(botUtterance.metadata);
     const newMessage = { ...botUtterance, text: String(botUtterance.text) };
+    if (botUtterance.metadata && botUtterance.metadata.customCss) {
+      newMessage.customCss = botUtterance.metadata.customCss;
+    }
     this.handleMessageReceived(newMessage);
   }
 
@@ -409,6 +414,9 @@ class Widget extends Component {
       if (this.props.customComponent) {
         this.props.dispatch(renderCustomComponent(this.props.customComponent, props, true));
       }
+    }
+    if (message.customCss) {
+      this.props.dispatch(setCustomCss(message.customCss));
     }
   }
 
