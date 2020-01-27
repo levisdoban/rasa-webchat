@@ -7,6 +7,7 @@ import Widget from '../index';
 import { store, initStore } from '../../../store/store';
 import LocalStorageMock from '../../../../mocks/localStorageMock';
 
+jest.useFakeTimers();
 
 describe('Messages metadata affect store', () => {
   const profile = assetMock;
@@ -40,6 +41,9 @@ describe('Messages metadata affect store', () => {
       }
     };
     widgetComponent.dive().dive().instance().handleBotUtterance(botUtter);
+    expect(setTimeout).toHaveBeenCalledTimes(1);
+    jest.runOnlyPendingTimers();
+
     expect(store.getState().metadata.get('userInput')).toEqual('disable');
     botUtter = {
       metadata: {
@@ -47,6 +51,8 @@ describe('Messages metadata affect store', () => {
       }
     };
     widgetComponent.dive().dive().instance().handleBotUtterance(botUtter);
+    expect(setTimeout).toHaveBeenCalledTimes(2);
+    jest.runOnlyPendingTimers();
     expect(store.getState().metadata.get('userInput')).toEqual('hide');
   });
 
@@ -57,6 +63,8 @@ describe('Messages metadata affect store', () => {
       }
     };
     widgetComponent.dive().dive().instance().handleBotUtterance(botUtter);
+    expect(setTimeout).toHaveBeenCalledTimes(3);
+    jest.runOnlyPendingTimers();
     expect(store.getState().metadata.get('linkTarget')).toEqual('_self');
 
     botUtter = {
@@ -65,6 +73,8 @@ describe('Messages metadata affect store', () => {
       }
     };
     widgetComponent.dive().dive().instance().handleBotUtterance(botUtter);
+    expect(setTimeout).toHaveBeenCalledTimes(4);
+    jest.runOnlyPendingTimers();
     expect(store.getState().metadata.get('linkTarget')).toEqual('_blank');
   });
 
@@ -85,6 +95,8 @@ describe('Messages metadata affect store', () => {
       }
     };
     widgetComponent.dive().dive().instance().handleBotUtterance(botUtter);
+    expect(setTimeout).toHaveBeenCalledTimes(5);
+    jest.runOnlyPendingTimers();
     expect(store.getState().behavior.get('pageChangeCallbacks').toJS()).toEqual({
       pageChanges: [
         {
@@ -108,9 +120,49 @@ describe('Messages metadata affect store', () => {
       }
     };
     widgetComponent.dive().dive().instance().handleBotUtterance(botUtter);
+    expect(setTimeout).toHaveBeenCalledTimes(6);
+    jest.runOnlyPendingTimers();
     expect(store.getState().metadata.get('domHighlight').toJS()).toEqual({
       selector: '.test',
       style: 'color: red'
     });
+  });
+
+  it('customCss metaData should change customCss info for the stored message in store', () => {
+    const botUtter = {
+      text: 'dummy',
+      metadata: {
+        customCss: {
+          css: 'color:red;',
+          style: 'custom'
+        }
+      }
+    };
+
+    widgetComponent.dive().dive().instance().handleBotUtterance(botUtter);
+    expect(setTimeout).toHaveBeenCalledTimes(7);
+    jest.runOnlyPendingTimers();
+    expect(store.getState().messages
+      .get(store.getState().messages.size - 1)
+      .toJS()
+      .customCss)
+      .toEqual({
+        css: 'color:red;',
+        style: 'custom'
+      });
+    const botUtter2 = {
+      text: 'dummy',
+      metadata: {
+      }
+    };
+
+    widgetComponent.dive().dive().instance().handleBotUtterance(botUtter2);
+    expect(setTimeout).toHaveBeenCalledTimes(8);
+    jest.runOnlyPendingTimers();
+    expect(store.getState().messages
+      .get(store.getState().messages.size - 1)
+      .toJS()
+      .customCss)
+      .toEqual(undefined);
   });
 });
